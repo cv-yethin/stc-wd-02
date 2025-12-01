@@ -26,7 +26,7 @@ A simple stopwatch built with HTML, CSS, and JavaScript. It supports starting th
 
 - `index.html` – handles the main layout and element structure.
 - `style.css` – controls the overall appearance and animations.
-- `script.js` – contains stopwatch logic, reverse-reset animation, and UI behavior.
+- `JS.js` – contains stopwatch logic, reverse-reset animation, and UI behavior.
 
 ## Contribution
 
