@@ -1,0 +1,119 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    font-family: "Indie Flower", cursive;
+    user-select: none;
+}
+
+body {
+    background: #778da9;
+    color: #eeeeee;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+#h1{
+    position: absolute;
+    top: 10%;
+    font-size: 40px;
+}
+
+.container {
+    text-align: center;
+}
+
+.display {
+    font-size: 10rem;
+    margin: 20px 0;
+    padding: 10px;
+    color: #E6E6E6;
+}
+
+.buttons button {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    background-color: #444;
+    color: white;
+}
+
+#startBtn {
+    background: white;
+    border-radius: 40px;
+    color: #2ecc71; 
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 8px 14px;
+    transition: color 0.25s ease;
+}
+#startBtn:hover {
+    color: #ffffff;
+    background-color:#2ecc71;
+    transition: 0.25s ease;
+}
+
+#pauseBtn {
+    background: white;
+    border-radius: 40px;
+    color: #e67e22; 
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 8px 14px;
+    transition: color 0.25s ease;
+}
+#pauseBtn:hover {
+    color: #ffffff;
+    background-color:#e67e22;
+    transition: 0.25s ease;
+}
+
+#resetBtn {
+    background: white;
+    border-radius: 40px;
+    color: #cc2e2e; 
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 8px 14px;
+    transition: color 0.25s ease;
+}
+#resetBtn:hover {
+    color: #ffffff;
+    background-color:#cc2e2e;
+    transition: 0.25s ease;
+}
+
+#lapBtn {
+    background: white;
+    border-radius: 40px;
+    color: #f1c40f; 
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 8px 14px;
+    transition: color 0.25s ease;
+}
+#lapBtn:hover {
+    color: #ffffff;
+    background-color:#f1c40f;
+    transition: 0.25s ease;
+}
+
+#laps {
+    margin-top: 20px;
+    list-style: none;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#laps li {
+    padding: 5px;
+    margin: 4px 0;
+    background: #333;
+    border-radius: 5px;
+}
