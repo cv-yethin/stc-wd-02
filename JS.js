@@ -55,29 +55,23 @@ function pause() {
 }
 
 function reset() {
-    if (isResetting) return; // prevent re-entry
+    if (isResetting) return;
     isResetting = true;
-
-    // freeze inputs
     if (controls) {
         controls.style.pointerEvents = "none";
     }
-
-    // ensure elapsed is current value (if running)
     if (running) {
         elapsed = Date.now() - startTime;
     }
     clearInterval(interval);
     running = false;
 
-    // reverse animation parameters
-    const duration = 600; // total reverse duration in ms
-    const tick = 10; // ms per frame
+    const duration = 600; 
+    const tick = 10; 
     const steps = Math.max(1, Math.floor(duration / tick));
     let reverseStart = Math.max(0, elapsed);
     const decrement = reverseStart / steps;
 
-    // if nothing to reverse, finish immediately
     if (reverseStart <= 0) {
         finishReset();
         return;
@@ -86,12 +80,10 @@ function reset() {
     let current = reverseStart;
     let reverseInterval = setInterval(() => {
         current -= decrement;
-
         if (current <= 0) {
             current = 0;
         }
 
-        // update display from current
         let ms = Math.floor((current % 1000) / 10);
         let sec = Math.floor((current / 1000) % 60);
         let min = Math.floor((current / 60000) % 60);
@@ -107,19 +99,13 @@ function reset() {
 }
 
 function finishReset() {
-    // final state
     running = false;
     elapsed = 0;
     startTime = 0;
 
-    // clear laps and label
     lapsList.innerHTML = "";
     lap_txt.innerText = "";
-
-    // reset display to zero
     display.textContent = "00:00:00.00";
-
-    // hide controls and laps area again
     if (controls) {
         controls.style.opacity = "0";
         controls.style.transform = "translateY(20px)";
@@ -129,27 +115,29 @@ function finishReset() {
         lapsArea.style.opacity = "0";
         lapsArea.style.transform = "translateX(40px)";
     }
-
     isResetting = false;
 }
 
 function lap() {
-    if (!running || isResetting) return;
-
+    let currentElapsed = running ? (Date.now() - startTime) : elapsed;
+    let ms = Math.floor((currentElapsed % 1000) / 10);
+    let sec = Math.floor((currentElapsed / 1000) % 60);
+    let min = Math.floor((currentElapsed / 60000) % 60);
+    let hr = Math.floor(currentElapsed / 3600000);
     const li = document.createElement("li");
-    li.textContent = display.textContent;
+
+    li.textContent = `${pad(hr)}:${pad(min)}:${pad(sec)}.${pad(ms)}`;
     li.style.transform = "translateX(20px)";
     li.style.opacity = "0";
     li.style.transition = "transform 0.25s ease, opacity 0.25s ease";
-
     lapsList.appendChild(li);
     requestAnimationFrame(() => {
         li.style.transform = "translateX(0)";
         li.style.opacity = "1";
     });
-
     lap_txt.innerText = 'laps';
 }
+
 
 function updateDisplay() {
     elapsed = Date.now() - startTime;
