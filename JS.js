@@ -2,10 +2,10 @@ let startTime = 0;
 let elapsed = 0;
 let interval;
 let running = false;
-
+let isResetting = false;
 
 const display = document.getElementById("display");
-const controls = document.getElementById("controls");     
+const controls = document.getElementById("controls");
 const lapsArea = document.querySelector(".laps-area");
 const lapsList = document.getElementById("laps");
 const lap_txt = document.querySelector("#laps-txt");
@@ -14,20 +14,22 @@ const pauseBtn = document.getElementById("pauseBtn");
 const resetBtn = document.getElementById("resetBtn");
 const lapBtn = document.getElementById("lapBtn");
 
-
-pauseBtn.addEventListener("click", (e) => { e.stopPropagation(); pause(); });
-resetBtn.addEventListener("click", (e) => { e.stopPropagation(); reset(); });
-lapBtn.addEventListener("click", (e) => { e.stopPropagation(); lap(); });
+pauseBtn.addEventListener("click", (e) => { e.stopPropagation(); if (!isResetting) pause(); });
+resetBtn.addEventListener("click", (e) => { e.stopPropagation(); if (!isResetting) reset(); });
+lapBtn.addEventListener("click", (e) => { e.stopPropagation(); if (!isResetting) lap(); });
 
 window.addEventListener("click", (e) => {
-    if (e.target.closest("#controls") || e.target.closest(".laps-area")) {
-        return;
+    if (e.target.closest("#controls") || e.target.closest(".laps-area")) return;
+    if (isResetting) return;
+    if (!running) {
+        start();
+    } else {
+        pause();
     }
-    start();
 });
 
 function start() {
-    if (running) return;
+    if (running || isResetting) return;
 
     running = true;
     startTime = Date.now() - elapsed;
@@ -46,51 +48,93 @@ function start() {
 }
 
 function pause() {
-    if (!running) return;
+    if (!running || isResetting) return;
     running = false;
     clearInterval(interval);
     elapsed = Date.now() - startTime;
 }
 
 function reset() {
+    if (isResetting) return; // prevent re-entry
+    isResetting = true;
+
+    // freeze inputs
+    if (controls) {
+        controls.style.pointerEvents = "none";
+    }
+
+    // ensure elapsed is current value (if running)
+    if (running) {
+        elapsed = Date.now() - startTime;
+    }
     clearInterval(interval);
+    running = false;
 
-    let reverseStart = elapsed;
-    let step = reverseStart / 200;
+    // reverse animation parameters
+    const duration = 600; // total reverse duration in ms
+    const tick = 10; // ms per frame
+    const steps = Math.max(1, Math.floor(duration / tick));
+    let reverseStart = Math.max(0, elapsed);
+    const decrement = reverseStart / steps;
 
+    // if nothing to reverse, finish immediately
+    if (reverseStart <= 0) {
+        finishReset();
+        return;
+    }
+
+    let current = reverseStart;
     let reverseInterval = setInterval(() => {
-        reverseStart -= step;
+        current -= decrement;
 
-        if (reverseStart <= 0) {
+        if (current <= 0) {
+            current = 0;
+        }
+
+        // update display from current
+        let ms = Math.floor((current % 1000) / 10);
+        let sec = Math.floor((current / 1000) % 60);
+        let min = Math.floor((current / 60000) % 60);
+        let hr = Math.floor(current / 3600000);
+
+        display.textContent = `${pad(hr)}:${pad(min)}:${pad(sec)}.${pad(ms)}`;
+
+        if (current === 0) {
             clearInterval(reverseInterval);
-            reverseStart = 0;
+            finishReset();
         }
+    }, tick);
+}
 
-        let ms = Math.floor((reverseStart % 1000) / 10);
-        let sec = Math.floor((reverseStart / 1000) % 60);
-        let min = Math.floor((reverseStart / 60000) % 60);
-        let hr = Math.floor(reverseStart / 3600000);
-
-        display.textContent =
-            `${pad(hr)}:${pad(min)}:${pad(sec)}.${pad(ms)}`;
-
-        if (reverseStart === 0) {
-            running = false;
-            elapsed = 0;
-            startTime = 0;
-            lapsList.innerHTML = "";
-            lap_txt.innerText = "";
-        }
-    }, 5);
-
+function finishReset() {
+    // final state
     running = false;
     elapsed = 0;
     startTime = 0;
+
+    // clear laps and label
+    lapsList.innerHTML = "";
+    lap_txt.innerText = "";
+
+    // reset display to zero
+    display.textContent = "00:00:00.00";
+
+    // hide controls and laps area again
+    if (controls) {
+        controls.style.opacity = "0";
+        controls.style.transform = "translateY(20px)";
+        controls.style.pointerEvents = "none";
+    }
+    if (lapsArea) {
+        lapsArea.style.opacity = "0";
+        lapsArea.style.transform = "translateX(40px)";
+    }
+
+    isResetting = false;
 }
 
-
 function lap() {
-    if (!running) return;
+    if (!running || isResetting) return;
 
     const li = document.createElement("li");
     li.textContent = display.textContent;
@@ -119,7 +163,7 @@ function updateDisplay() {
 }
 
 function pad(num) {
-    return String(num).padStart(2, "0");
+    return String(Math.max(0, Math.floor(num))).padStart(2, "0");
 }
 
 if (controls) {
